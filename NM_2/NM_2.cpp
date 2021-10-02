@@ -16,7 +16,6 @@ int main()
 	cout.precision(6);
 
 	const double epsilone = 10e-5;
-	const double maximumDif2F = 0.179587;
 
 	cout << "Integral F(x) = " << TrapezeMethod(0, M_PI, 2800) << '\n';
 	cout << "Integral F(x) = " << GaussMethod(0, M_PI, 4) << '\n';
@@ -30,37 +29,35 @@ double F(double x)
 
 double GaussF(double t, double a, double b)
 {
-	cout << (b - a / 2) * F((a + b / 2) + (b - a / 2) * t) << endl;
-	return (b - a / 2) * F((a + b / 2) + (b - a / 2) * t);
+	return F(((a + b) / 2) + (((b - a) / 2) * t));
 }
-
-
 
 double TrapezeMethod(double a, double b, double n)
 {
 	double h = (b - a) / n;
 
-	double s = h / 2 * (F(a) + F(b));
+	double result = h / 2 * (F(a) + F(b));
 
 	for (int i = 1; i < n; i++)
 	{
-		s += (F(a + h * i) * h);
+		result += (F(a + h * i) * h);
 	}
 
-	return s;
+	return result;
 }
 
 double GaussMethod(double a, double b, double n)
 {
-	double s = 0;
+	double result = 0.0;
 
-	double t[3] = { -0.774596669, 0.0, 0.774596669 };
-	double A[3] = { 0.555555556, 0.888888889, 0.555555556 };
+	double t[4] = { -0.8611363, -0.3399810, 0.3399810, 0.8611363 };
+	double A[4] = { 0.3478548, 0.6521451, 0.6521451, 0.3478548 };
 
-	for (int i = 0; i < n - 1; i++)
+	for (int i = 0; i < n; i++)
 	{
-		s += A[i] * GaussF(t[i], a, b);
+		result += A[i] * ((b - a) / 2) * GaussF(t[i], a, b);
+		cout << "result = " << result << endl;
 	}
 
-	return s;
+	return result;
 }
