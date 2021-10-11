@@ -3,8 +3,9 @@
 #include <iostream>
 #include <math.h>
 
-double TrapezeMethod(double a, double b, double n);
+double TrapezeMethod(double a, double b, double n, double epsiolne);
 double GaussMethod(double a, double b, double n);
+double GaussMethod(double a, double b, double n, double epsilone);
 double F(double x);
 double GaussF(double t, double a, double b);
 
@@ -17,8 +18,8 @@ int main()
 
 	const double epsilone = 10e-5;
 
-	cout << "Integral F(x) = " << TrapezeMethod(0, M_PI, 2800) << '\n';
-	cout << "Integral F(x) = " << GaussMethod(0, M_PI, 4) << '\n';
+	cout << "Integral F(x) = " << TrapezeMethod(0, M_PI, 2, epsilone) << '\n';
+	cout << "Integral F(x) = " << GaussMethod(0, M_PI, 4, epsilone) << '\n';
 }
 
 double F(double x)
@@ -32,18 +33,33 @@ double GaussF(double t, double a, double b)
 	return F(((a + b) / 2) + (((b - a) / 2) * t));
 }
 
-double TrapezeMethod(double a, double b, double n)
+double TrapezeMethod(double a, double b, double n, double epsiolne)
 {
-	double h = (b - a) / n;
+	double h1 = (b - a) / n;
+	double h2 = (b - a) / (2 * n);
 
-	double result = h / 2 * (F(a) + F(b));
+	double I1 = h1 / 2 * (F(a) + F(b));
+	double I2 = h2 / 2 * (F(a) + F(b));
 
 	for (int i = 1; i < n; i++)
 	{
-		result += (F(a + h * i) * h);
+		I1 += (F(a + h1 * i) * h1);
 	}
 
-	return result;
+	for (int i = 1; i < 2 * n; i++)
+	{
+		I2 += (F(a + h2 * i) * h2);
+	}
+
+	cout << "iterations = " << n * 2 << '\n';
+
+	if (abs(I1 - I2) < epsiolne)
+	{
+		return I2;
+	}
+
+
+	return TrapezeMethod(0, M_PI, n * 2, epsiolne);
 }
 
 double GaussMethod(double a, double b, double n)
@@ -56,8 +72,45 @@ double GaussMethod(double a, double b, double n)
 	for (int i = 0; i < n; i++)
 	{
 		result += A[i] * ((b - a) / 2) * GaussF(t[i], a, b);
-		cout << "result = " << result << endl;
+		//cout << "result = " << result << endl;
 	}
 
 	return result;
+}
+
+
+double GaussMethod(double a, double b, double n, double epsilone)
+{
+	double I1 = 0.0;
+	double I2 = 0.0;
+
+	int iterations = 2;
+	double h = b - a / 2;
+
+
+	I1 = GaussMethod(a, b, 4);
+	I2 = GaussMethod(a, b / 2, 4) + GaussMethod(b / 2, b, 4);
+
+	iterations *= 2;
+
+	while (abs(I1 - I2) > epsilone)
+	{
+		cout << "I1 = " << I1 << "		I2 = " << I2 << '\n';
+		cout << "I1 - I2 = " << abs(I1 - I2) << '\n';
+
+		I1 = I2;
+		I2 = 0.0;
+
+		for (int i = 0; i < iterations - 1; i++)
+		{
+			I2 += GaussMethod(a + h * i, h * (i + 1), 4);
+			//cout << "		I2 = " << I2 << '\n';
+		}
+
+		h /= 2;
+		iterations *= 2;
+	}
+
+	return I2;
+
 }
