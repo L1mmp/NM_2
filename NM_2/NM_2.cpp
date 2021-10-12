@@ -16,7 +16,7 @@ int main()
 {
 	cout.precision(6);
 
-	const double epsilone = 10e-5;
+	const double epsilone = 1e-6;
 
 	cout << "Integral F(x) = " << TrapezeMethod(0, M_PI, 2, epsilone) << '\n';
 	cout << "Integral F(x) = " << GaussMethod(0, M_PI, 4, epsilone) << '\n';
@@ -72,7 +72,6 @@ double GaussMethod(double a, double b, double n)
 	for (int i = 0; i < n; i++)
 	{
 		result += A[i] * ((b - a) / 2) * GaussF(t[i], a, b);
-		//cout << "result = " << result << endl;
 	}
 
 	return result;
@@ -85,26 +84,24 @@ double GaussMethod(double a, double b, double n, double epsilone)
 	double I2 = 0.0;
 
 	int iterations = 2;
-	double h = b - a / 2;
+	double h = (b - a) / 2;
 
 
 	I1 = GaussMethod(a, b, 4);
 	I2 = GaussMethod(a, b / 2, 4) + GaussMethod(b / 2, b, 4);
 
 	iterations *= 2;
+	h /= 2;
 
 	while (abs(I1 - I2) > epsilone)
 	{
-		cout << "I1 = " << I1 << "		I2 = " << I2 << '\n';
-		cout << "I1 - I2 = " << abs(I1 - I2) << '\n';
 
 		I1 = I2;
 		I2 = 0.0;
 
-		for (int i = 0; i < iterations - 1; i++)
+		for (int i = 0; i < iterations; i++)
 		{
 			I2 += GaussMethod(a + h * i, h * (i + 1), 4);
-			//cout << "		I2 = " << I2 << '\n';
 		}
 
 		h /= 2;
